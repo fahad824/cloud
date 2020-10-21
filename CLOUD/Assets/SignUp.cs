@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Proyecto26;
-using Packages;
+
+using UnityEngine.SceneManagement;
 
 public class SignUp : MonoBehaviour
 {
@@ -11,51 +12,36 @@ public class SignUp : MonoBehaviour
     public Text Password;
 
     public Transform Error;
+
+    public static User user = new User();
     public void Submit()
     {
-        User user = new User();
+        
         user.Name = Email.text;
         user.Password = Password.text;
 
         //Debug.Log(CheckIfUserNameExist(user.Name));
-        if(CheckIfUserNameExist(Email.text) == false)
-        {
-           RestClient.Put(DataBaseConfig.URL + user.Name + "/.json", user);
-           LoadMainScene();
-        }
-        else
-        {
-           ShowErrorMessage();
-           
-        }
+        // if(CheckIfUserNameExist(Email.text) == false)
+        //{
+       
+       RestClient.Put(DataBaseConfig.URL + user.Name + "/.json", user);
+        LoadMainScene();
         
-    }
-    public bool CheckIfUserNameExist(string Name)
-    {
-        bool Exist = true;
-        
-        RestClient.Get<User>(DataBaseConfig.URL + Name + ".json").Then(response =>
-        {
-            Debug.Log(response.Password);
-            if (response.Password == "")
-            {
-                
-                Exist = false;
-                Debug.Log("U: " + response.Name + "Response: " + Name);
-            }
-            else if (response.Name == Name)
-            {
-                Exist = true;
-            }
+        SavToBytes.SaveLoginData(user);
+        //}
+        //else
+        //{
+        // ShowErrorMessage();
 
-        });
-        
-        return Exist;
+        //}
+
     }
+    
 
     public void LoadMainScene()
     {
         Debug.Log("Main Screen Loaded");
+        SceneManager.LoadScene("MainScene");
     }
 
     IEnumerator ShowErrorMessage()
@@ -63,6 +49,10 @@ public class SignUp : MonoBehaviour
         Error.gameObject.SetActive(true);
         yield return new WaitForSecondsRealtime(2);
         Error.gameObject.SetActive(true);
+    }
+    public void LoadLogIn()
+    {
+        SceneManager.LoadScene("LogIn");
     }
 
 }
